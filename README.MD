@@ -5,7 +5,9 @@ Tool which copies a SQL Server table directly to a Fabric Lakehouse Delta Lake, 
 Can deploy to a ZIP which will contain Python packaged within. Useful in situations where new software cannot be installed on a machine.
 
 ## SQL to Fabric Copy Tool preperation
+[!IMPORTANT]
 __**IT IS BOTH UNTESTED AND NOT RECOMMENDED TO USE MINICONDA / ANACONDA - YOU HAVE BEEN WARNED**__
+[!NOTE]
 **Your interpreter can be chosen at steps where this will matter**
 1.	Install [Python](https://www.python.org/downloads/)  
 2.	If Python is already installed, I recommend clearing locally installed packages to reduce the size of the packages transferred into the new venv (`CleanLocalPip.ps1` will do this AND make a back up of currently installed packages into `backup_requirements.txt`)
