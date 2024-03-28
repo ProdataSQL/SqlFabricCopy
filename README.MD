@@ -13,7 +13,7 @@ Can deploy to a ZIP which will contain Python packaged within. Useful in situati
 2.	If Python is already installed, I recommend clearing locally installed packages to reduce the size of the packages transferred into the new venv (`CleanLocalPip.ps1` will do this AND make a back up of currently installed packages into `backup_requirements.txt`)
 3.	Execute .\Python\Setup.ps1 (make sure VS code is CLOSED for this step)
 4.  VS Code should now default to this new venv interpreter with required packages installed
-5.  Ensure permissions on your workspace are set as per [this tutorial](PREPARE.md)
+5.  Ensure permissions on your workspace are set as per [this tutorial](PREPARE.MD)
 6.  Execute ./SqlFabricCopy.ps1 variation from samples below:
 7.  Execute ./ZipDeploy.ps1 to create a zip deployment which includes the portable virtualenvironment
 
