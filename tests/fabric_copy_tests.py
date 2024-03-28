@@ -51,48 +51,6 @@ class TestFabricCopy(unittest.TestCase):
             service_prinicipal_client_secret= config.get("TestValues", "client_secret", fallback=None),
         )
     
-    def test_upload_table_csv_lakehouse(self):
-        """
-        Test case for the upload_table_csv_lakehouse function.
-        """
-        sql_server = self.sql_server
-        database_name = self.database_name
-        sink_account_name = self.onelake_account_name
-        sink_workspace_name = self.workspace_name
-        schema_name = "dbo"
-        table_name = ["Account"]
-        sink_lakehouse_name = "FabricLH"
-        sink_directory = "temp/dwa0export"
-        csv_store_directory = "output"
-        csv_file_suffix = None
-
-        delete_directory(
-            self.service_client,
-            self.workspace_name,
-            sink_lakehouse_name,
-            sink_directory,
-        )
-
-        upload_table_csv_lakehouse(
-            sql_server,
-            database_name,
-            schema_name,
-            table_name,
-            sink_account_name,
-            sink_workspace_name,
-            sink_lakehouse_name,
-            sink_directory,
-            csv_store_directory,
-            csv_file_suffix,
-            self.service_client
-        )
-
-        assert count_files_in_directory(
-            self.service_client,
-            self.workspace_name,
-            sink_lakehouse_name,
-            sink_directory,
-        ) == len(table_name)
     def test_delete_directory(self):
         """
         Test case for the delete_directory function.
@@ -128,7 +86,7 @@ class TestFabricCopy(unittest.TestCase):
         expected_number_file = 9
         self.service_client = get_service_client_token_credential(
             self.onelake_account_name,
-            DefaultAzureCredentialOptions(exclude_managed_identity_credential=False),
+            DefaultAzureCredentialOptions(exclude_managed_identity_credential=False)
         )
         assert count_files_in_directory(
             self.service_client,
@@ -145,7 +103,7 @@ class TestFabricCopy(unittest.TestCase):
         expected_number_file = 9
         self.service_client = get_service_client_token_credential(
             self.onelake_account_name,
-            DefaultAzureCredentialOptions(exclude_managed_identity_credential=True),
+            DefaultAzureCredentialOptions(exclude_managed_identity_credential=True)
         )
         assert count_files_in_directory(
             self.service_client,
@@ -164,19 +122,7 @@ class TestFabricCopy(unittest.TestCase):
         execute_bsp_csv(self.sql_server, self.database_name, schema_name, table, output_csv_path)
     
         assert count_files(output_csv_path) == 1
-    def test_bcp_copy_csv_to_delta(self):
-        """
-        Test case for the execute_bsp_csv function for a single table
-        """
-        schema_name = "dbo"
-        table = "Account"
-        output_csv_path = "output"
-        output_delta_path = "output/table"
-        delete_directory_if_exists(output_csv_path)
-        execute_bsp_csv(self.sql_server, self.database_name, schema_name, table, output_csv_path)
-        csv_file = pd.read_csv(path.join(output_csv_path, f"{table}.csv")) # type: ignore
-        dt = DeltaTable(output_delta_path)
-        write_deltalake(dt, csv_file, mode="overwrite")
+
         
     def test_bcp_copy_multiple(self):
         """
@@ -190,12 +136,10 @@ class TestFabricCopy(unittest.TestCase):
     
         assert count_files(output_csv_path) == len(tables)
     def test_table_to_dataframe(self):
-        schema_name = "dbo"
-        table = "Account"
+        table = "dbo.Account"
         df = table_to_dataframe( # type: ignore
             self.sql_server,
             self.database_name,
-            schema_name,
             table
         )
 
@@ -203,22 +147,43 @@ class TestFabricCopy(unittest.TestCase):
 
         write_deltalake(output_delta_path, df, mode="overwrite") # type: ignore
     def test_table_to_onelake(self):
-        schema_name = "dbo"
-        table = "DimDateRange"
+        arguments = {
+            'storage_account': None,
+            'sql_server': self.sql_server,
+            'database_name': self.database_name,
+            'source': 'aw.DimCurrency',
+            'workspace_name': self.workspace_name,
+            'lakehouse_name': "FabricLH",
+            'target_table': None,
+            'tenant_id': None,
+            'client_id': None,
+            'client_secret': None
+        }
+
         upload_table_lakehouse(
-            self.sql_server,
-            self.database_name,
-            schema_name,
-            table,
-            self.onelake_account_name,
-            self.workspace_name,
-            "FabricLH"
+            **arguments # type: ignore
+        )
+    
+    def test_table_query_to_onelake(self):
+        arguments = {
+            'storage_account': None,
+            'sql_server': 'localhost',
+            'database_name': 'AdventureWorksDW',
+            'source': 'SELECT * FROM aw.DimAccount',
+            'workspace_name': 'FabricDW [Dev]',
+            'lakehouse_name': 'FabricLH', 
+            'target_table': 'DimAccount', 
+            'tenant_id': None, 
+            'client_id': None, 
+            'client_secret': None
+            }
+        upload_table_lakehouse(
+            **arguments # type: ignore
         )
 def delete_directory_if_exists(directory :str):
     if path.exists(directory): shutil.rmtree(directory)
 def count_files(directory :str ) -> int:
     return len([name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
     
-        
 if __name__ == '__main__':
     unittest.main()

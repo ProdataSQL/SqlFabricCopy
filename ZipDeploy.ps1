@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-$name = "fabric_copy"
+$name = "SqlFabricCopy"
 $venv_path = ".venv"
 
 $reset_pwd = $PWD
@@ -19,7 +19,7 @@ if(Test-Path $zip_path) {
     Remove-Item $zip_path
 }
 
-Compress-Archive -Path $venv_path, "fabric_copy", "Run.ps1" -DestinationPath $zip_path
+Compress-Archive -Path $venv_path, "fabric_copy", "$name.ps1" -DestinationPath $zip_path
 
 
 Set-Location $reset_pwd

@@ -1,11 +1,14 @@
 """ Module with functions for working with SQL database. """
+from logging import Logger
 import subprocess
 from typing import List
 import os.path as path
 import os
-import pyarrow as pa # type: ignore
 import pandas as pd
-import pyodbc
+from sqlalchemy import create_engine
+import pandas as pd
+logger : Logger | None = None
+
 def execute_bsp_csv(
         sql_server: str,
         database_name: str,
@@ -59,14 +62,18 @@ def execute_bsp_csv(
 def table_to_dataframe(
         sql_server: str,
         database_name: str,
-        schema_name: str,
-        table_name : str,
+        source : str,
 ) -> pd.DataFrame: # type: ignore
-
-    cnxn = pyodbc.connect(driver='{SQL Server}',
-                          server=sql_server,
-                          database=database_name,
-                          trusted_connection='yes'
-    )
-    query = f"SELECT * FROM {schema_name}.{table_name}"
-    return pd.read_sql(query, cnxn, dtype_backend="pyarrow") # type: ignore
+    if logger: logger.debug(f"Connecting to {sql_server=} and {database_name=} using Windows authentication.")
+    # TODO re use connection if possible
+    connection_string = f'mssql+pyodbc://@{sql_server}/{database_name}?driver=ODBC+Driver+17+for+SQL+Server'
+    engine = create_engine(connection_string)
+    if " from " in source.lower():
+        query = source
+    else:
+        query = f"SELECT * FROM {source}"
+    if logger: logger.info(f"Executing query: {query}")
+    df = pd.read_sql(query, engine, dtype_backend="pyarrow") # type: ignore
+    # TODO potentially reuse and not close here until end?
+    engine.dispose()
+    return df

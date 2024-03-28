@@ -8,6 +8,31 @@
 
 # This script will create a virtual environment and install the requirements from the requirements.txt file
 $ErrorActionPreference = "Stop"
+# Get all Python executables in the PATH
+$pythons = Get-Command python* -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "*\python.exe" }
+
+if ($pythons -eq $null) {
+    Write-Host "No Python executables found in the PATH."
+    exit
+}
+
+Write-Host "Select the desired Python version to use:"
+for ($i = 0; $i -lt $pythons.Count; $i++) {
+    Write-Host "$i`: $($pythons[$i].Path)"
+}
+
+$selection = Read-Host "Enter the number corresponding to the desired Python version"
+$selectedPython = $pythons[$selection]
+
+if ($selectedPython -eq $null) {
+    Write-Host "Invalid selection."
+    exit
+}
+
+Write-Host "selected: $($selectedPython.Path)"
+
+
+
 $venv_path = ".venv"
 $reset_pwd = $PWD
 Set-Location $PSScriptRoot
@@ -29,12 +54,13 @@ if ($process -ne $null) {
 if(Test-Path $venv_path) {
     Remove-Item $venv_path -Recurse
 }
+& $selectedPython.Path -m pip install virtualenv --no-warn-script-location --user
 
-python -m venv .venv --copies --clear
+& $selectedPython.Path -m venv .venv --copies --clear
 
 ./.venv/Scripts/Activate.ps1
 
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 
 
 

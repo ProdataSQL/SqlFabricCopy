@@ -1,3 +1,5 @@
+
+from logging import Logger
 import os
 import os.path as path
 from typing import Literal
@@ -11,6 +13,7 @@ import validators  # type: ignore
 
 # from typing import Dict
 
+logger : Logger | None = None
 
 class DefaultAzureCredentialOptions:
     """Options for configuring the DefaultAzureCredential."""
@@ -41,7 +44,7 @@ class DefaultAzureCredentialOptions:
 
 
 def get_service_client_token_credential(
-    account: str,
+    account: str | None = None,
     default_azure_credential_options: DefaultAzureCredentialOptions = DefaultAzureCredentialOptions(),
     service_prinicipal_tenant_id: str | None = None,
     service_prinicipal_client_id: str | None = None,
@@ -57,20 +60,26 @@ def get_service_client_token_credential(
         DataLakeServiceClient: The DataLakeServiceClient object.
 
     """
+    if not account:
+        account = "onelake"
     account_url: str = (
         account
         if account.startswith("https://")
         else f"https://{account}.dfs.fabric.microsoft.com"
     )
     if service_prinicipal_client_id is not None and service_prinicipal_tenant_id is not None and service_prinicipal_client_secret is not None:
+        if logger: logger.info("Using token credentials.")
         token_credential = ClientSecretCredential(service_prinicipal_tenant_id, service_prinicipal_client_id, service_prinicipal_client_secret)
     else:
+        if logger: logger.info("Using default azure credentials.")
         token_credential = DefaultAzureCredential(
             **default_azure_credential_options.__dict__,
 
         )
 
     service_client = DataLakeServiceClient(account_url, credential=token_credential)
+    
+    if logger: logger.info(f"Created DataLakeService client ({account_url=})")
 
     return service_client
 
@@ -213,7 +222,27 @@ def delete_file(
     delete_file_path = normalize_lakehouse_path(lakehouse_name, file_path)
 
     file_system_client.delete_file(delete_file_path)  # type: ignore
+def delete_table(
+    service_client: DataLakeServiceClient,
+    workspace_name: str,
+    lakehouse_name: str,
+    table_name: str,
+):
+    """
+    Deletes a directory in Azure Data Lake Storage.
 
+    Parameters:
+        service_client (DataLakeServiceClient): The DataLakeServiceClient object used.
+        directory_path (str): The path of the directory to delete.
+    """
+    # file_system_client = get_file_system(service_client, workspace_name)  # type: ignore
+    delete_table_path = normalize_lakehouse_path(lakehouse_name, table_name, type="Tables")
+    file_system_client = service_client.get_file_system_client(workspace_name)  # type: ignore
+    directory_client = file_system_client.get_directory_client(delete_table_path)  # type: ignore
+    if directory_client.exists():  # type: ignore
+        if logger: logger.debug(f"Deleting existing table on Lakehouse: {delete_table_path}")
+        file_system_client.delete_directory(delete_table_path)  # type: ignore
+    directory_client.close()  # type: ignore
 
 def delete_directory(
     service_client: DataLakeServiceClient,
@@ -233,6 +262,8 @@ def delete_directory(
     file_system_client = service_client.get_file_system_client(workspace_name)  # type: ignore
     directory_client = file_system_client.get_directory_client(delete_directory_path)  # type: ignore
     if directory_client.exists():  # type: ignore
+        if logger: logger.debug(f"Deleting existing directory on Lakehouse: {delete_directory_path}")
+
         file_system_client.delete_directory(delete_directory_path)  # type: ignore
     directory_client.close()  # type: ignore
 
@@ -294,30 +325,24 @@ def copy_deltatable(
     lakehouse_name: str,
     workspace_name: str
 ):
-    """
-    Copies a delta table from local to fabric lakehouse.
 
-    Parameters:
-        lakehouse_name (str): The name of the lakehouse.
-        sink_directory (str): The name of the sink directory.
-
-    Returns:
-        str: The normalized sink path.
-    """
     file_system_client = service_client.get_file_system_client(workspace_name) # type: ignore
+
 
     target_directory = os.path.basename(local_table_path)
 
     for dirpath, _dirnames, filenames in os.walk(local_table_path):
-        for filename in filenames:
-            local_file_path = os.path.join(dirpath, filename)
 
+        for filename in filenames:
+            local_file_path = os.path.join(dirpath, filename).replace("\\", "/")
+
+            delete_table(service_client,workspace_name, lakehouse_name,target_directory)
             lakehouse_path = normalize_lakehouse_path(lakehouse_name, target_directory, type= "Tables")
             file_path = __parquet_filename_to_snappy(os.path.relpath(local_file_path, local_table_path).replace("\\", "/"))
+            
             data_lake_file_path = os.path.join(lakehouse_path, file_path).replace("\\", "/")
             directory_client = get_directory(file_system_client, lakehouse_path)
-
-            print(f"{data_lake_file_path=}\n{local_file_path=}\n")
+            if logger: logger.debug(f"Copying {local_file_path=} to {data_lake_file_path=}")
             file_client = directory_client.get_file_client(file_path)
 
             with open(local_file_path, 'rb') as local_file:
