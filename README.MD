@@ -6,7 +6,8 @@ Can deploy to a ZIP which will contain Python packaged within. Useful in situati
 
 ## SQL to Fabric Copy Tool preperation
 1.	Install [Python](https://www.python.org/downloads/) 
-    __**UNTESTED AND UNRECOMMENDED TO USE MINICONDA / ANACONDA - YOU HAVE BEEN WARNED**__
+
+ __**UNTESTED AND UNRECOMMENDED TO USE MINICONDA / ANACONDA - YOU HAVE BEEN WARNED**__
 2.	If Python is already installed, I recommend clearing locally installed packages to reduce the size of the packages transferred into the new venv (`CleanLocalPip.ps1` will do this AND make a back up of currently installed packages into `backup_requirements.txt`)
 3.	Execute .\Python\Setup.ps1 (make sure VS code is CLOSED for this step)
 4.  VS Code should now default to this new venv interpreter with required packages installed
