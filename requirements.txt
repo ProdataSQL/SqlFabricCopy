@@ -1,0 +1,8 @@
+azure-storage-file-datalake
+azure-identity
+azure-accounts
+validators
+deltalake
+pandas
+pyodbc
+pyarrow

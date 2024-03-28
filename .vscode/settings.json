@@ -1,0 +1,14 @@
+{
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "strict",
+    "python.defaultInterpreterPath": ".\\Python\\.venv\\Scripts\\python.exe",
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./Python",
+        "-p",
+        "*_tests.py"
+    ],
+    "python.testing.unittestEnabled": true,
+}
