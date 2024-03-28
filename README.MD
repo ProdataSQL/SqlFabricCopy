@@ -42,12 +42,15 @@ Can deploy to a ZIP which will contain Python packaged within. Useful in situati
 - `-log_level`: Specifies the logging level, optional.
 
 # Build Deployment
-`./Python/Setup.ps1`
+`./Python/Setup.ps1` 
+
 `./Python/DeployZip.ps1` (requires setup to be completed)
 
 # Test
 Testing requires Windows Auth access to SQL server AND permissions for Managed Identity / VS Code identity / Service Principle to be configured within Fabric Workspace
+
 `python -m unittest discover -s . -p *_tests.py` (Or through "Testing" tab on VS Code)
+
 To configure testing variables edit the "test_config.ini" file located in `./Python`
 
 
