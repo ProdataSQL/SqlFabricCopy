@@ -1,7 +1,7 @@
 # SQL to Fabric Copy Tool
 Tool which copies a SQL Server table directly to a Fabric Lakehouse Delta Lake, using Python libraries [`deltalake`](https://delta-io.github.io/delta-rs/),`azure-storage-file-datalake`, `azure-identity`, `deltalake`, `pandas`, `pyodbc` and `pyarrow`.
 
-Can deploy to a ZIP which will contain Python packaged within. Useful in situations where new software cannot be installed on a machine.
+Can deploy to a ZIP which will contain Python packaged within. Useful in situations where new software  or Pythoin cannot be installed on machine wide.
 
 ## SQL to Fabric Copy Tool preperation
 > **IMPORTANT**
