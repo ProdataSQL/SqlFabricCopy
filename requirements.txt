@@ -4,4 +4,5 @@ validators
 deltalake
 pandas
 pyarrow
-sqlalchemy 
+sqlalchemy
+pyodbc

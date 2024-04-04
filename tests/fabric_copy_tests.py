@@ -1,5 +1,5 @@
 """
-    Test cases for fabric_copy module.
+    Test cases for sql_fabric_copy module.
 """
 
 import unittest
@@ -7,9 +7,9 @@ import configparser
 import os
 import os.path as path
 import shutil 
-from fabric_copy.db_tools import execute_bsp_csv, table_to_dataframe # type: ignore
-from fabric_copy.fabric_copy_helper import upload_table_csv_lakehouse, upload_table_lakehouse
-from fabric_copy.onelake_tools import (
+from sql_fabric_copy.db_tools import execute_bsp_csv, table_to_dataframe # type: ignore
+from sql_fabric_copy.sql_fabric_copy_helper import upload_table_csv_lakehouse, upload_table_lakehouse
+from sql_fabric_copy.onelake_tools import (
     DefaultAzureCredentialOptions,
     count_files_in_directory,
     delete_directory,
@@ -23,7 +23,7 @@ import pandas as pd
 
 class TestFabricCopy(unittest.TestCase):
     """
-    Test cases for fabric_copy module.
+    Test cases for sql_fabric_copy module.
     """
 
     def setUp(self) -> None:

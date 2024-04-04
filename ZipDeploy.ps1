@@ -19,7 +19,7 @@ if(Test-Path $zip_path) {
     Remove-Item $zip_path
 }
 
-Compress-Archive -Path $venv_path, "fabric_copy", "$name.ps1" -DestinationPath $zip_path
+Compress-Archive -Path $venv_path, "sql_fabric_copy", "$name.ps1" -DestinationPath $zip_path
 
 
 Set-Location $reset_pwd

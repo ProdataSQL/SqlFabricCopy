@@ -66,7 +66,7 @@ $OLD_PATH = $env:Path
 # defaults to using the VENV python and not the system python
 $env:Path = ".venv\Scripts;$env:Path"
 
-python -m fabric_copy @arg_list
+python -m sql_fabric_copy @arg_list
 
 Set-Location $reset_pwd
 $env:Path = $OLD_PATH

@@ -6,10 +6,10 @@ import sys
 
 from . import db_tools
 from . import onelake_tools
-from . import fabric_copy_helper
+from . import sql_fabric_copy_helper
 
 
-from .fabric_copy_helper import upload_table_lakehouse
+from .sql_fabric_copy_helper import upload_table_lakehouse
 
 LOG_LEVELS = [name for name, value in vars(logging).items() if isinstance(value, int) and not name.startswith('_')]
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         logger.level = level
         # TODO improve the distribution of this logger
         db_tools.logger = logger
-        fabric_copy_helper.logger = logger
+        sql_fabric_copy_helper.logger = logger
         onelake_tools.logger = logger
     
     del args["log_level"]
