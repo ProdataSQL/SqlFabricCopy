@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 # Get all Python executables in the PATH
 $pythons = Get-Command python* -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "*\python.exe" }
 
-if ($pythons -eq $null) {
+if ($null -eq $pythons) {
     Write-Host "No Python executables found in the PATH."
     exit
 }
@@ -24,7 +24,7 @@ for ($i = 0; $i -lt $pythons.Count; $i++) {
 $selection = Read-Host "Enter the number corresponding to the desired Python version"
 $selectedPython = $pythons[$selection]
 
-if ($selectedPython -eq $null) {
+if ($null -eq $selectedPython) {
     Write-Host "Invalid selection."
     exit
 }
@@ -37,7 +37,7 @@ $venv_path = ".venv"
 $reset_pwd = $PWD
 Set-Location $PSScriptRoot
 $process = Get-Process "Code" -ErrorAction SilentlyContinue
-if ($process -ne $null) {
+if ($null -ne $process) {
     
     $response = Read-Host "This install script will cause issues because Visual Studio Code is running. Do you want to continue? (y/[n])"
     $continue_prompt = $true

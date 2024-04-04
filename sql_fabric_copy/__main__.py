@@ -33,25 +33,25 @@ if __name__ == "__main__":
         level = logging.getLevelName(args['log_level'].upper())
         if not isinstance(level, int):
             error(f"Log level \"{level}\" provided did not match levels available ({LOG_LEVELS}).")
-            sys.exit()  
+            sys.exit()
         logger = logging.getLogger(__name__)
-        
+
         logger.level = level
         # TODO improve the distribution of this logger
         db_tools.logger = logger
         sql_fabric_copy_helper.logger = logger
         onelake_tools.logger = logger
-    
+
     del args["log_level"]
-    
+
     if logger: logger.debug(f"{args=}")
     else: debug(f"{args=}")
-    
+
     if " from " in args["source"].lower() and not args["target_table"]:
         raise Exception("If source provided is a query, you MUST pass a target_table.")
     if not args["storage_account"]:
         args["storage_account"] = "onelake"
-    
+
     upload_table_lakehouse(
         **args
     )
