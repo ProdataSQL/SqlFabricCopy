@@ -10,10 +10,13 @@ from deltalake import write_deltalake # type: ignore
 from azure.storage.filedatalake import (
     DataLakeServiceClient,
 )
+import pandas as pd
 from .db_tools import table_to_dataframe
 from .onelake_tools import (
     copy_deltatable,
-    get_service_client_token_credential
+    get_service_client_token_credential,
+    upload_file,
+    upload_file_to_directory
 )
 logger : Logger | None = None
 
@@ -109,6 +112,8 @@ def upload_table_lakehouse(
 
         write_deltalake(_temp_table_location, df, mode=deltalake_mode)
         target_tablename = os.path.basename(_temp_table_location)
+        if " from " in table_name.lower():
+            table_name = f"({table_name})"
         print(f"Starting:\t{sql_server}.{database_name}.{table_name} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
         copy_deltatable(service_client, _temp_table_location, lakehouse_name, workspace_name)
         print(f"Finished:\t{sql_server}.{database_name}.{table_name} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
@@ -123,7 +128,7 @@ def upload_csv_lakehouse(
     tenant_id : str | None = None,
     client_id : str | None = None,
     client_secret : str | None = None,
-    deltalake_mode: Literal['error', 'append', 'overwrite', 'ignore'] = "overwrite",
+    target_path: str | None = "",
     target_file: str | None = None,
     service_client : DataLakeServiceClient | None = None,
     temp_csv_location: str | None = "output"
@@ -203,12 +208,23 @@ def upload_csv_lakehouse(
             _temp_csv_location = f"{path.join(temp_csv_location, query_or_table)}".replace('\\', '/')
         if path.exists(_temp_csv_location): shutil.rmtree(_temp_csv_location)
 
-        # write_csvfile(_temp_csv_location, df, mode=deltalake_mode)
+        write_csvfile(_temp_csv_location, df)
         target_file = target_file if target_file else query_or_table
         target_tablename = os.path.basename(_temp_csv_location)
+        target_path = f"{target_path}/{target_file}"
         print(f"Starting:\t{sql_server}.{database_name}.{query_or_table} => /{workspace_name}/{lakehouse_name}/Files/{target_tablename}")
-        
+        upload_file(
+            service_client,
+            _temp_csv_location,
+            lakehouse_name,
+            workspace_name,
+            target_path
+        )
         print(f"Finished:\t{sql_server}.{database_name}.{query_or_table} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
+def write_csvfile(csv_location : str, df : pd.DataFrame):
+    if not csv_location.endswith(".csv"):
+        csv_location = f"{csv_location}.csv"
+    df.to_csv(csv_location, index=False)
 
 def create_local_directory_if_not_exists(directory: str):
     """

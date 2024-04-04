@@ -149,6 +149,32 @@ def upload_file_to_directory(
     with open(file=local_path, mode="rb") as data:
         data = file_client.upload_data(data, overwrite=True)  # type: ignore
 
+def upload_file(
+    service_client: DataLakeServiceClient,
+    local_path: str,
+    lakehouse_name: str,
+    workspace_name: str,
+    file_path: str
+):
+    """
+    Uploads a file to a directory in Azure Data Lake Storage.
+
+    Parameters:
+        directory_client (DataLakeDirectoryClient): The client for the target directory.
+        local_path (str): The local path of the file to upload.
+        file_name (str): The name of the file in the target directory.
+
+    Returns:
+        None
+    """
+    directory_client = service_client.get_directory_client(file_path)  # type: ignore
+    
+    file_path = normalize_lakehouse_path(lakehouse_name, file_path, workspace_name, type="Files")
+
+    file_client = directory_client.get_file_client(file_path) # type: ignore
+    with open(local_path, 'rb') as local_file:
+        file_client.upload_data(local_file, overwrite=True) # type: ignore
+
 
 def check_if_file_exists(
     service_client: DataLakeServiceClient,
@@ -318,13 +344,13 @@ def copy_deltatable(
 
 
     target_directory = os.path.basename(local_table_path)
+    delete_table(service_client,workspace_name, lakehouse_name,target_directory)
 
     for dirpath, _dirnames, filenames in os.walk(local_table_path):
 
         for filename in filenames:
             local_file_path = os.path.join(dirpath, filename).replace("\\", "/")
 
-            delete_table(service_client,workspace_name, lakehouse_name,target_directory)
             lakehouse_path = normalize_lakehouse_path(lakehouse_name, target_directory, type= "Tables")
             file_path = __parquet_filename_to_snappy(os.path.relpath(local_file_path, local_table_path).replace("\\", "/"))
             
