@@ -108,11 +108,10 @@ def upload_table_lakehouse(
         if path.exists(_temp_table_location): shutil.rmtree(_temp_table_location)
 
         write_deltalake(_temp_table_location, df, mode=deltalake_mode)
-        tablename = target_table if target_table else query_or_table
         target_tablename = os.path.basename(_temp_table_location)
-        print(f"Starting:\t{sql_server}.{database_name}.{tablename} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
+        print(f"Starting:\t{sql_server}.{database_name}.{query_or_table} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
         copy_deltatable(service_client, _temp_table_location, lakehouse_name, workspace_name)
-        print(f"Finished:\t{sql_server}.{database_name}.{tablename} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
+        print(f"Finished:\t{sql_server}.{database_name}.{query_or_table} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
 
 def upload_csv_lakehouse(
     sql_server: str,
