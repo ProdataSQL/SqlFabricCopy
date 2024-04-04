@@ -94,7 +94,7 @@ def upload_table_lakehouse(
             database_name,
             query_or_table
         )
-
+        table_name = query_or_table
         if target_table and len(source) == 1:
             query_or_table = target_table
         if query_or_table and "." in query_or_table:
@@ -109,9 +109,9 @@ def upload_table_lakehouse(
 
         write_deltalake(_temp_table_location, df, mode=deltalake_mode)
         target_tablename = os.path.basename(_temp_table_location)
-        print(f"Starting:\t{sql_server}.{database_name}.{query_or_table} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
+        print(f"Starting:\t{sql_server}.{database_name}.{table_name} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
         copy_deltatable(service_client, _temp_table_location, lakehouse_name, workspace_name)
-        print(f"Finished:\t{sql_server}.{database_name}.{query_or_table} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
+        print(f"Finished:\t{sql_server}.{database_name}.{table_name} => /{workspace_name}/{lakehouse_name}/Tables/{target_tablename}")
 
 def upload_csv_lakehouse(
     sql_server: str,
