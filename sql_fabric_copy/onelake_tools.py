@@ -17,17 +17,6 @@ logger : Logger | None = None
 
 class DefaultAzureCredentialOptions:
     """Options for configuring the DefaultAzureCredential."""
-
-    # options : Dict[str,bool]= {
-    #     "exclude_workload_identity_credential": True,
-    #     "exclude_developer_cli_credential": True,
-    #     "exclude_cli_credential" : True,
-    #     "exclude_environment_credential" : True,
-    #     "exclude_managed_identity_credential" : False,
-    #     "exclude_powershell_credential" : True,
-    #     "exclude_visual_studio_code_credential" : True,
-    #     "exclude_interactive_browser_credential" : True,
-    # }
     exclude_workload_identity_credential: bool = True
     exclude_developer_cli_credential: bool = True
     exclude_cli_credential: bool = True
@@ -39,8 +28,7 @@ class DefaultAzureCredentialOptions:
 
     def __init__(self, exclude_managed_identity_credential: bool = False) -> None:
         self.exclude_managed_identity_credential = exclude_managed_identity_credential
-        if exclude_managed_identity_credential:
-            self.exclude_cli_credential = True
+        self.exclude_cli_credential = exclude_managed_identity_credential
 
 
 def get_service_client_token_credential(

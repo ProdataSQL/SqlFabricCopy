@@ -7,13 +7,13 @@ from typing import List, Literal
 
 from deltalake import write_deltalake # type: ignore
 
+from azure.storage.filedatalake import (
+    DataLakeServiceClient,
+)
 from .db_tools import table_to_dataframe
 from .onelake_tools import (
     copy_deltatable,
     get_service_client_token_credential
-)
-from azure.storage.filedatalake import (
-    DataLakeServiceClient,
 )
 logger : Logger | None = None
 
@@ -83,7 +83,7 @@ def upload_table_lakehouse(
     for query_or_table in source:
         query_or_table = query_or_table.lstrip().rstrip()
 
-        df = table_to_dataframe(
+        df = table_to_dataframe( 
             sql_server,
             database_name,
             query_or_table
@@ -112,7 +112,11 @@ def upload_table_lakehouse(
             service_prinicipal_client_secret=client_secret
         )
     for delta_table in delta_tables:
+    
+        print(f"Starting:\t{sql_server}.{database_name}.{delta_table} => /{workspace_name}/{lakehouse_name}/Tables/{delta_table}")
         copy_deltatable(service_client, delta_table, lakehouse_name, workspace_name)
+        print(f"Finished:\t{sql_server}.{database_name}.{delta_table} => /{workspace_name}/{lakehouse_name}/Tables/{delta_table}")
+
 
 def create_local_directory_if_not_exists(directory: str):
     """

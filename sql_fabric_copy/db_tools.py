@@ -59,7 +59,7 @@ def execute_bsp_csv(
 
         bcp_run.check_returncode()
 
-def table_to_dataframe(
+def table_to_dataframe( 
         sql_server: str,
         database_name: str,
         source : str,
@@ -68,6 +68,7 @@ def table_to_dataframe(
     # TODO re use connection if possible
     connection_string = f'mssql+pyodbc://@{sql_server}/{database_name}?driver=ODBC+Driver+17+for+SQL+Server'
     engine = create_engine(connection_string)
+
     if " from " in source.lower():
         query = source
     else:

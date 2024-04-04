@@ -9,7 +9,7 @@ from . import onelake_tools
 from . import sql_fabric_copy_helper
 
 
-from .sql_fabric_copy_helper import upload_table_lakehouse
+from .sql_fabric_copy_helper import upload_table_lakehouse # type: ignore
 
 LOG_LEVELS = [name for name, value in vars(logging).items() if isinstance(value, int) and not name.startswith('_')]
 

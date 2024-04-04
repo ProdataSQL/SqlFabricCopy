@@ -6,7 +6,7 @@ import unittest
 import configparser
 import os
 import os.path as path
-import shutil 
+import shutil
 from deltalake.writer import write_deltalake # type: ignore
 from sql_fabric_copy.db_tools import execute_bsp_csv, table_to_dataframe # type: ignore
 from sql_fabric_copy.sql_fabric_copy_helper import upload_table_lakehouse
@@ -25,7 +25,7 @@ class TestFabricCopy(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         config = configparser.ConfigParser()
-        config.read("./Python/test_config.ini")
+        config.read("./test_config.ini")
         self.sql_server = config.get("TestValues", "sql_server", fallback="localhost")
         self.database_name = (
             config.get("TestValues", "database_name", fallback="AdventureWorksDW")
