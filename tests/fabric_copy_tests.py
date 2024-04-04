@@ -9,7 +9,7 @@ import os.path as path
 import shutil
 from deltalake.writer import write_deltalake # type: ignore
 from sql_fabric_copy.db_tools import execute_bsp_csv, table_to_dataframe # type: ignore
-from sql_fabric_copy.sql_fabric_copy_helper import upload_table_lakehouse
+from sql_fabric_copy.sql_fabric_copy_helper import upload_csv_lakehouse, upload_table_lakehouse
 from sql_fabric_copy.onelake_tools import (
     DefaultAzureCredentialOptions,
     count_files_in_directory,
@@ -119,7 +119,21 @@ class TestFabricCopy(unittest.TestCase):
     
         assert count_files(output_csv_path) == 1
 
-        
+    def test_csv_to_onelake(self):
+        arguments = {
+            'storage_account': None,
+            'sql_server': self.sql_server,
+            'database_name': self.database_name,
+            'source': 'aw.DimCurrency',
+            'workspace_name': self.workspace_name,
+            'lakehouse_name': "FabricLH",
+            'tenant_id': None,
+            'client_id': None,
+            'client_secret': None
+        }
+        upload_csv_lakehouse(
+            **arguments # type: ignore
+        )
     def test_bcp_copy_multiple(self):
         """
         Test case for the execute_bsp_csv function for a single table

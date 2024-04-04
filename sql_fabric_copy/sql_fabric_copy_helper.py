@@ -15,8 +15,7 @@ from .db_tools import table_to_dataframe
 from .onelake_tools import (
     copy_deltatable,
     get_service_client_token_credential,
-    upload_file,
-    upload_file_to_directory
+    upload_file
 )
 logger : Logger | None = None
 
